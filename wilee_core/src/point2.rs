@@ -26,7 +26,7 @@ pub struct Point2<T> {
 
 impl<T> Point2<T> {
     /// Create a 2-dimensionals point from two values
-    fn new(x: T, y: T) -> Self {
+    pub fn new(x: T, y: T) -> Self {
         return Self { x, y };
     }
 }

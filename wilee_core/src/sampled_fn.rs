@@ -16,44 +16,37 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-/// 1-dimensional sampled function
-/// args correspond to x-axis values
-/// values correspond to function values
+use super::point2::Point2;
+
+/// Representation of univariate sampled function
+/// coodinates correspond to pair of (x-axis, y-axis) values
 #[derive(Default)]
 struct SampledFn<T> {
-    args: Vec<T>,
-    values: Vec<T>,
+    coordinates: Vec<Point2<T>>,
 }
 
 impl<T> SampledFn<T>
 where
     T: PartialOrd + Copy,
 {
-    /// Sort sampled function coordinates according to x-axis values
-    /// This function is private, indeed it is only used in other function.
-    fn sort_according_to_args(&mut self) {
-        let mut coordinates: Vec<(&T, &T)> = self.args.iter().zip(self.values.iter()).collect();
-
-        coordinates.sort_by(|(arg_left, _value_left), (arg_right, _value_right)| {
-            arg_left.partial_cmp(arg_right).unwrap()
-        });
-
-        (self.args, self.values) = coordinates.iter().cloned().unzip();
-    }
-
     /// Create a sampled function by giving x-axis values and function values
     /// The struct created take ownership of object given in argument
     pub fn new(args: Vec<T>, values: Vec<T>) -> Self {
-        let mut sampled_fn: Self = Self { args, values };
-        sampled_fn.sort_according_to_args();
+        let mut coordinates: Vec<Point2<T>> = args
+            .iter()
+            .zip(values.iter())
+            .map(|(&arg, &value)| Point2::new(arg, value))
+            .collect();
 
-        return sampled_fn;
+        coordinates.sort_by(|pt_left, pt_right| pt_left.x.partial_cmp(&pt_right.x).unwrap());
+
+        return Self { coordinates };
     }
 
     /// Search interval where value given in argument is.
     /// We return the index of x-axis such as value is in [x[index], x[index + 1]]
     pub fn search_interval(&self, x: T) -> Option<usize> {
-        match self.args.iter().position(|&arg| x < arg) {
+        match self.coordinates.iter().position(|point| x < point.x) {
             Some(index) => {
                 if index == 0 {
                     return None;
@@ -65,6 +58,18 @@ where
                 return None;
             }
         }
+    }
+
+    /// Get x-axis values
+    /// This function is private because is only useful for test
+    fn get_x_vec(&self) -> Vec<T> {
+        return self.coordinates.iter().map(|point| point.x).collect();
+    }
+
+    /// Get y-axis values
+    /// This function is private because is only useful for test
+    fn get_y_vec(&self) -> Vec<T> {
+        return self.coordinates.iter().map(|point| point.y).collect();
     }
 }
 
@@ -84,8 +89,8 @@ mod tests {
         let fun: SampledFn<f64> = SampledFn::new(args.clone(), values.clone());
 
         let precision: f64 = 0.01;
-        assert!(fun.args.approx(&args_reference, precision));
-        assert!(fun.values.approx(&values_reference, precision));
+        assert!(fun.get_x_vec().approx(&args_reference, precision));
+        assert!(fun.get_y_vec().approx(&values_reference, precision));
     }
 
     #[test]
