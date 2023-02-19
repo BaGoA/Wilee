@@ -89,26 +89,26 @@ mod tests {
     }
 
     #[test]
-    fn test_approx_for_Vec_f32() {
+    fn test_approx_for_vec_f32() {
         let reference: Vec<f32> = vec![1.0, 2.0, 3.0];
         let precision: f32 = 0.01;
 
         let mut value: Vec<f32> = vec![1.0, 2.0, 3.0];
         assert!(value.approx(&reference, precision));
 
-        let mut value: Vec<f32> = vec![1.0, 2.2, 3.0];
+        value = vec![1.0, 2.2, 3.0];
         assert!(!value.approx(&reference, precision));
     }
 
     #[test]
-    fn test_approx_for_Vec_f64() {
+    fn test_approx_for_vec_f64() {
         let reference: Vec<f64> = vec![1.0, 2.0, 3.0];
         let precision: f64 = 0.01;
 
         let mut value: Vec<f64> = vec![1.0, 2.0, 3.0];
         assert!(value.approx(&reference, precision));
 
-        let mut value: Vec<f64> = vec![1.0, 2.2, 3.0];
+        value = vec![1.0, 2.2, 3.0];
         assert!(!value.approx(&reference, precision));
     }
 }
